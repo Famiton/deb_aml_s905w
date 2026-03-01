@@ -1,0 +1,17 @@
+## /etc/default/u-boot - configuration file for u-boot-update(8)
+
+#U_BOOT_UPDATE="true"
+
+#U_BOOT_ALTERNATIVES="default recovery"
+#U_BOOT_DEFAULT="l0"
+#U_BOOT_PROMPT="1"
+#U_BOOT_ENTRIES="all"
+#U_BOOT_MENU_LABEL="Debian GNU/Linux"
+U_BOOT_PARAMETERS="rootflags=data=writeback rw console=ttyAML0,115200n8 console=tty0 no_console_suspend consoleblank=0 fsck.fix=yes fsck.repair=yes net.ifnames=0 max_loop=128 loglevel=1 voutmode=hdmi disablehpd=false overscan=100 sdrmode=auto"
+#U_BOOT_ROOT=""
+#U_BOOT_TIMEOUT="50"
+U_BOOT_FDT="amlogic/meson-gxl-s905w-p281.dtb"
+#U_BOOT_FDT_DIR="/usr/lib/linux-image-"
+#U_BOOT_FDT_OVERLAYS=""
+#U_BOOT_FDT_OVERLAYS_DIR="/boot/dtbo/"
+U_BOOT_SYNC_DTBS="true"

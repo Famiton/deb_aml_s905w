@@ -1,0 +1,122 @@
+{{- $arch     := or .arch     "arm64" -}}
+{{- $suite    := or .suite    "trixie" -}}
+{{- $user     := or .user     "baron" -}}
+{{- $rpass    := or .rpass    "12345" -}}
+{{- $hostname := or .hostname "tv-box" -}}
+{{- $image    := or .pask     (printf "debian-%s-%s.tgz" $suite $arch) -}}
+{{- $image    := or .image    (printf "debian-%s-%s.img" $suite $arch) -}}
+architecture: {{ $arch }}
+
+actions:
+  - action: debootstrap
+    description: create Debian filesystem
+    suite: {{ $suite }}
+    components: [ main, contrib, non-free ]
+    mirror: https://mirror.yandex.ru/debian/
+    variant: minbase
+
+  - action: overlay
+    description: Configure dpkg
+    source: overlays/dpkg
+ 
+  - action: apt
+    description: Install  base packages
+    packages:
+#      - systemd-sysv
+      - libpam-systemd
+      - systemd-resolved
+      - systemd-timesyncd
+      - locales
+      - console-setup
+      - openssh-server
+      - rsync
+      - u-boot-menu
+      - u-boot-amlogic-binaries
+      - htop
+      - mc
+      - parted
+      - iproute2
+      - iputils-ping
+      - zstd
+      - e2fsprogs
+      - sudo
+
+  - action: overlay
+    description: Install U-Boot menu configuration
+    source: overlays/u-boot-menu
+
+  - action: overlay
+    description: Setup systemd-networkd
+    source: overlays/networkd
+
+  - action: run
+    description: Configure locales
+    chroot: true
+    script: scripts/setup_locales.sh
+
+  - action: run
+    description: Set hostname
+    chroot: true
+    command: echo {{ $hostname }} > /etc/hostname
+
+  - action: run
+    description: Enable systemd-networkd
+    chroot: true
+    command: systemctl enable systemd-networkd
+
+  - action: run
+    description: DNS resolving enable
+    chroot: true
+    command: systemctl enable systemd-resolved
+
+  - action: run
+    description: NTP client enable
+    chroot: true
+    command: systemctl enable systemd-timesyncd
+
+  - action: run
+    description: Copy U-Boot
+    chroot: false
+    command: sh -c "cp -av ${ROOTDIR}/usr/lib/u-boot/libretech-cc/u-boot.bin  ${ROOTDIR}/boot/"
+
+  - action: overlay
+    description: Install Boot load
+    source: overlays/u-boot-load
+
+  - action: image-partition
+    imagename: {{ $image }}
+    imagesize: 2GB
+    partitiontype: msdos
+    mountpoints:
+      - mountpoint: /
+        partition: ROOTFS
+      - mountpoint: /boot
+        partition: BOOT
+
+    partitions:
+      - name: BOOT
+        fs: fat32
+        fslabel: BOOT
+        start: 2MB
+        end: 256MB
+        flags: [ boot ]
+      - name: ROOTFS
+        fs: ext4
+        fslabel: ROOTFS
+        start: 256MB
+        end: 100%
+
+
+  - action: filesystem-deploy
+    description: Deploying filesystem onto image
+    setup-kernel-cmdline: false
+
+  - action: apt
+    description: Install linux-image-arm64
+    packages:
+      - linux-image-arm64
+
+  - action: run
+    description: Set root password
+    chroot: true
+    command:  echo "root:{{ $rpass }}" | chpasswd
