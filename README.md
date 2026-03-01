@@ -5,4 +5,5 @@
  ## Install
   Burn the image to a USB flash disk or sdcard
  ## DTB
- [U_BOOT_FDT="amlogic/meson-gxl-s905w-p281.dtb"](https://github.com/Famiton/deb_aml_s905w/blob/main/overlays/u-boot-menu/etc/default/u-boot)
+ - [U_BOOT_FDT="amlogic/meson-gxl-s905w-p281.dtb"](https://github.com/Famiton/deb_aml_s905w/blob/main/overlays/u-boot-menu/etc/default/u-boot) 
+ - [model_database](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/build-armbian/armbian-files/common-files/etc/model_database.conf)
