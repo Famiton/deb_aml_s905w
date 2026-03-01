@@ -1,1 +1,6 @@
-# deb_aml_s905w
+# Debian Linux image for Android TV box 
+ - Amlogic S905W (Meson GXL)
+ ##  Image
+  debos --disable-fakemachine rootfs.yaml
+ ## Install
+  Burn the image to a USB flash disk or sdcard
